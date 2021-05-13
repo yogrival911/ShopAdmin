@@ -1,0 +1,106 @@
+{
+  "project_info": {
+    "project_number": "987611288022",
+    "firebase_url": "https://myfirebaseproject-5dac5.firebaseio.com",
+    "project_id": "myfirebaseproject-5dac5",
+    "storage_bucket": "myfirebaseproject-5dac5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:987611288022:android:d3d238bf8fa17a6cde9477",
+        "android_client_info": {
+          "package_name": "com.example.bloodpressuremonitor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "987611288022-e04oi40bbnldaoocgrcrsmlqciiq8too.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHk8f48uulaKMDzROVj40e7s8Oqo36VFU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "987611288022-e04oi40bbnldaoocgrcrsmlqciiq8too.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:987611288022:android:4dadcd13bd4b23d5de9477",
+        "android_client_info": {
+          "package_name": "com.yogdroidtech.mallfirebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "987611288022-rtaoc85d5dd7j5b6vne60o47btpmmjkt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yogdroidtech.mallfirebase",
+            "certificate_hash": "3a33ff1d35f05e10a0d1268b80312b6b48f3a913"
+          }
+        },
+        {
+          "client_id": "987611288022-e04oi40bbnldaoocgrcrsmlqciiq8too.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHk8f48uulaKMDzROVj40e7s8Oqo36VFU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "987611288022-e04oi40bbnldaoocgrcrsmlqciiq8too.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:987611288022:android:aa3dedb0eadc154ede9477",
+        "android_client_info": {
+          "package_name": "com.yogdroidtech.shopadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "987611288022-e04oi40bbnldaoocgrcrsmlqciiq8too.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHk8f48uulaKMDzROVj40e7s8Oqo36VFU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "987611288022-e04oi40bbnldaoocgrcrsmlqciiq8too.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
