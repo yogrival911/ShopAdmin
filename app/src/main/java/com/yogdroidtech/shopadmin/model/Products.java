@@ -1,6 +1,8 @@
 package com.yogdroidtech.shopadmin.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Products implements Serializable {
 
@@ -13,12 +15,13 @@ public class Products implements Serializable {
     private Boolean isWishList;
     private String unit ;
     private String imgUrl;
+    private List<String> imgUrlList = new ArrayList<>();
 
     public Products(String imgUrl) {
         this.imgUrl = imgUrl;
     }
 
-    public Products(String productName, String category, String subCategory, int id, int markPrice, int sellPrice, Boolean isWishList, String unit, String imgUrl) {
+    public Products(String productName, String category, String subCategory, int id, int markPrice, int sellPrice, Boolean isWishList, String unit, List<String> imgUrlList) {
         this.productName = productName;
         this.category = category;
         this.subCategory = subCategory;
@@ -27,7 +30,7 @@ public class Products implements Serializable {
         this.sellPrice = sellPrice;
         this.isWishList = isWishList;
         this.unit = unit;
-        this.imgUrl = imgUrl;
+        this.imgUrlList = imgUrlList;
     }
 
     public Products() {

@@ -2,11 +2,22 @@ package com.yogdroidtech.shopadmin;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.TargetApi;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.VectorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -44,7 +55,7 @@ import java.util.UUID;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ProductUploadActivity extends AppCompatActivity {
+public class ProductUploadActivity extends AppCompatActivity implements uploadListener {
     private FirebaseAuth mAuth;
     private static int RC_SIGN_IN= 123;
     private TextView userName;
@@ -54,9 +65,15 @@ public class ProductUploadActivity extends AppCompatActivity {
     private FirebaseUser currentUser;
     private Uri filePath;
     private final int PICK_IMAGE_REQUEST = 22;
+    private GridLayoutManager gridLayoutManager;
+    private PlaceHolderAdapter placeHolderAdapter;
+    private  int placePosition;
+    List<Uri> filePathLists = new ArrayList<>();
+    List<String> uploadFileUrlList = new ArrayList<>();
 
     private List<Products> productsList = new ArrayList<>();
     private List<Banner> bannerList = new ArrayList<>();
+    private List<Bitmap> bitmapList = new ArrayList<>();
 
     @BindView(R.id.button6)
     Button choose;
@@ -64,8 +81,9 @@ public class ProductUploadActivity extends AppCompatActivity {
     @BindView(R.id.button7)
     Button upload;
 
-    @BindView(R.id.imageView3)
-    ImageView imageView;
+
+    @BindView(R.id.rvThumbnail)
+    RecyclerView rvThumbnail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +97,19 @@ public class ProductUploadActivity extends AppCompatActivity {
         currentUser = mAuth.getCurrentUser();
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
+
+        Bitmap icon = getBitmaps(this,R.drawable.add);
+//        Bitmap icon = BitmapFactory.decodeResource(getApplicationContext().getResources(),R.drawable.add);
+//
+        bitmapList.add(icon);
+        bitmapList.add(icon);
+        bitmapList.add(icon);
+        bitmapList.add(icon);
+        bitmapList.add(icon);
+        gridLayoutManager = new GridLayoutManager(this, 4);
+        placeHolderAdapter = new PlaceHolderAdapter(bitmapList, this::onclick);
+        rvThumbnail.setLayoutManager(gridLayoutManager);
+        rvThumbnail.setAdapter(placeHolderAdapter);
 
         choose.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,7 +187,7 @@ public class ProductUploadActivity extends AppCompatActivity {
 
     private void uploadImage()
     {
-        if (filePath != null) {
+        if (filePathLists.size() != 0) {
 
             // Code for showing progressDialog while uploading
             ProgressDialog progressDialog = new ProgressDialog(this);
@@ -166,66 +197,56 @@ public class ProductUploadActivity extends AppCompatActivity {
             StorageReference ref = storageReference.child("products/" + imageName);
 
 
-            ref.putFile(filePath).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+           for(int i=0; i<filePathLists.size();i++){
+               ref.putFile(filePathLists.get(i)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                   @Override
+                   public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                       String path = task.getResult().toString();
+                       Toast.makeText(ProductUploadActivity.this, "Image Uploaded!!", Toast.LENGTH_SHORT).show();
+                       ref.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                           @Override
+                           public void onComplete(@NonNull Task<Uri> task) {
+
+                               Log.i("to", task.toString());
+                               uploadFileUrlList.add(task.getResult().toString());
+                               Log.i("yog", uploadFileUrlList.toString());
+                           }
+                       });
+
+                   }
+               }).addOnFailureListener(new OnFailureListener() {
+                   @Override
+                   public void onFailure(@NonNull Exception e) {
+                       progressDialog.dismiss();
+                       Toast.makeText(ProductUploadActivity.this, "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                   }
+               }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                                   @Override
+                                   public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                                       double progress = (100.0 * taskSnapshot.getBytesTransferred()/ taskSnapshot.getTotalByteCount());progressDialog.setMessage("Uploaded " + (int)progress + "%");
+                                   }
+                               });
+           }
+            progressDialog.dismiss();
+            Log.i("yog", uploadFileUrlList.toString());
+
+            Products product = new Products("","","",9,9,9,true,"kg",uploadFileUrlList);
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("products").document().set(product).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
-                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                    String path = task.getResult().toString();
-                    Toast.makeText(ProductUploadActivity.this, "Image Uploaded!!", Toast.LENGTH_SHORT).show();
-                    ref.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Uri> task) {
-                            Log.i("to", task.toString());
-                            Products product = new Products("","","",9,9,9,true,"kg",task.getResult().toString());
-                            FirebaseFirestore db = FirebaseFirestore.getInstance();
-                            db.collection("products").document().set(product).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Toast.makeText(ProductUploadActivity.this, "Image Saved in Database!!", Toast.LENGTH_SHORT).show();
-
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(ProductUploadActivity.this, "Image Saved in Database!!", Toast.LENGTH_SHORT).show();
-
-                                }
-                            });
-                            progressDialog.dismiss();
-                        }
-                    });
+                public void onSuccess(Void aVoid) {
+                    Toast.makeText(ProductUploadActivity.this, "Image Saved in Database!!", Toast.LENGTH_SHORT).show();
 
                 }
             }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e)
-                        {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(ProductUploadActivity.this, "Image Saved in Database!!", Toast.LENGTH_SHORT).show();
 
-                            // Error, Image not uploaded
-                            progressDialog.dismiss();
-                            Toast.makeText(ProductUploadActivity.this,
-                                            "Failed " + e.getMessage(),
-                                            Toast.LENGTH_SHORT)
-                                    .show();
-                        }
-                    })
-                    .addOnProgressListener(
-                            new OnProgressListener<UploadTask.TaskSnapshot>() {
+                }
+            });
 
-                                // Progress Listener for loading
-                                // percentage on the dialog box
-                                @Override
-                                public void onProgress(
-                                        UploadTask.TaskSnapshot taskSnapshot)
-                                {
-                                    double progress
-                                            = (100.0
-                                            * taskSnapshot.getBytesTransferred()
-                                            / taskSnapshot.getTotalByteCount());
-                                    progressDialog.setMessage(
-                                            "Uploaded "
-                                                    + (int)progress + "%");
-                                }
-                            });
+
         }
     }
 
@@ -244,33 +265,21 @@ public class ProductUploadActivity extends AppCompatActivity {
                 // ...
             } else {
                 Log.i("yogesh", "failed");
-
-                // Sign in failed. If response is null the user canceled the
-                // sign-in flow using the back button. Otherwise check
-                // response.getError().getErrorCode() and handle the error.
-                // ...
             }
         }
 
-        if (requestCode == PICK_IMAGE_REQUEST
-                && resultCode == RESULT_OK
-                && data != null
-                && data.getData() != null) {
-
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             // Get the Uri of data
             filePath = data.getData();
             try {
 
-                // Setting image on image view using Bitmap
-                Bitmap bitmap = MediaStore
-                        .Images
-                        .Media
-                        .getBitmap(
-                                getContentResolver(),
-                                filePath);
-                imageView.setImageBitmap(bitmap);
+                filePathLists.add(filePath);
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
+                bitmapList.set(placePosition, bitmap);
+                placeHolderAdapter.setBitmapList(bitmapList);
+                placeHolderAdapter.notifyDataSetChanged();
+//                imageView.setImageBitmap(bitmap);
             }
-
             catch (IOException e) {
                 // Log the exception
                 e.printStackTrace();
@@ -280,4 +289,29 @@ public class ProductUploadActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onclick(int position) {
+        placePosition = position;
+        selectImage();
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private static Bitmap getBitmap(VectorDrawable vectorDrawable) {
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
+                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        vectorDrawable.draw(canvas);
+        return bitmap;
+    }
+    private static Bitmap getBitmaps(Context context, int drawableId) {
+        Drawable drawable = ContextCompat.getDrawable(context, drawableId);
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable) drawable).getBitmap();
+        } else if (drawable instanceof VectorDrawable) {
+            return getBitmap((VectorDrawable) drawable);
+        } else {
+            throw new IllegalArgumentException("unsupported drawable type");
+        }
+    }
 }
