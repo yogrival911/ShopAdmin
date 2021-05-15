@@ -47,9 +47,12 @@ import com.yogdroidtech.shopadmin.model.Banner;
 import com.yogdroidtech.shopadmin.model.Products;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import butterknife.BindView;
@@ -81,9 +84,11 @@ public class ProductUploadActivity extends AppCompatActivity implements uploadLi
     @BindView(R.id.button7)
     Button upload;
 
-
     @BindView(R.id.rvThumbnail)
     RecyclerView rvThumbnail;
+
+    @BindView(R.id.saveProduct)
+    Button saveProduct;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +126,12 @@ public class ProductUploadActivity extends AppCompatActivity implements uploadLi
             @Override
             public void onClick(View view) {
                 uploadImage();
+            }
+        });
+        saveProduct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                saveProduct();
             }
         });
         if(currentUser!=null){
@@ -187,32 +198,30 @@ public class ProductUploadActivity extends AppCompatActivity implements uploadLi
 
     private void uploadImage()
     {
-        if (filePathLists.size() != 0) {
+        if (filePath!=null) {
 
-            // Code for showing progressDialog while uploading
             ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("Uploading...");
             progressDialog.show();
             String imageName = UUID.randomUUID().toString();
             StorageReference ref = storageReference.child("products/" + imageName);
 
-
-           for(int i=0; i<filePathLists.size();i++){
-               ref.putFile(filePathLists.get(i)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+               ref.putFile(filePath).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                    @Override
                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                        String path = task.getResult().toString();
                        Toast.makeText(ProductUploadActivity.this, "Image Uploaded!!", Toast.LENGTH_SHORT).show();
+
                        ref.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
                            @Override
                            public void onComplete(@NonNull Task<Uri> task) {
-
-                               Log.i("to", task.toString());
+                               progressDialog.dismiss();
                                uploadFileUrlList.add(task.getResult().toString());
                                Log.i("yog", uploadFileUrlList.toString());
+                               Toast.makeText(ProductUploadActivity.this, "Image URL Downloaded!!", Toast.LENGTH_SHORT).show();
+
                            }
                        });
-
                    }
                }).addOnFailureListener(new OnFailureListener() {
                    @Override
@@ -226,27 +235,6 @@ public class ProductUploadActivity extends AppCompatActivity implements uploadLi
                                        double progress = (100.0 * taskSnapshot.getBytesTransferred()/ taskSnapshot.getTotalByteCount());progressDialog.setMessage("Uploaded " + (int)progress + "%");
                                    }
                                });
-           }
-            progressDialog.dismiss();
-            Log.i("yog", uploadFileUrlList.toString());
-
-            Products product = new Products("","","",9,9,9,true,"kg",uploadFileUrlList);
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            db.collection("products").document().set(product).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    Toast.makeText(ProductUploadActivity.this, "Image Saved in Database!!", Toast.LENGTH_SHORT).show();
-
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(ProductUploadActivity.this, "Image Saved in Database!!", Toast.LENGTH_SHORT).show();
-
-                }
-            });
-
-
         }
     }
 
@@ -272,7 +260,7 @@ public class ProductUploadActivity extends AppCompatActivity implements uploadLi
             // Get the Uri of data
             filePath = data.getData();
             try {
-
+//                uploadImage();
                 filePathLists.add(filePath);
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
                 bitmapList.set(placePosition, bitmap);
@@ -293,6 +281,40 @@ public class ProductUploadActivity extends AppCompatActivity implements uploadLi
     public void onclick(int position) {
         placePosition = position;
         selectImage();
+    }
+
+    private void saveProduct(){
+
+        String[] arr = new String[uploadFileUrlList.size()];
+        for (int i =0; i < uploadFileUrlList.size(); i++){
+            arr[i] = uploadFileUrlList.get(i);
+        }
+
+        Map<String, Object> docData = new HashMap<>();
+        docData.put("imgUrl",Arrays.asList(arr));
+        docData.put("id", 123);
+        docData.put("productName", "Car");
+        docData.put("category", "Car");
+        docData.put("subCategory", "Car");
+        docData.put("markPrice", 44);
+        docData.put("sellPrice", 33);
+        docData.put("isWishList", false);
+        docData.put("unit", "KG");
+
+        Products product = new Products("","","",88,9,9,true,"kg",uploadFileUrlList);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("products").document().set(docData).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(ProductUploadActivity.this, "Image Saved in Database!!", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(ProductUploadActivity.this, "Image Saved in Database!!", Toast.LENGTH_SHORT).show();
+
+            }
+        });
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
