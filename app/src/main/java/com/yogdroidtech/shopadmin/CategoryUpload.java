@@ -19,9 +19,11 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,8 +42,10 @@ import com.google.firebase.storage.UploadTask;
 import com.yogdroidtech.shopadmin.model.Banner;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -60,6 +64,10 @@ public class CategoryUpload extends AppCompatActivity {
     private Uri filePath;
     private String categoryURL;
     private final int PICK_IMAGE_REQUEST = 22;
+    private int numberOfLines = 1;
+    private EditText et;
+    private List<EditText> editTextList = new ArrayList<>();
+
 
     @BindView(R.id.button2)
     Button choose;
@@ -75,6 +83,10 @@ public class CategoryUpload extends AppCompatActivity {
     EditText subCat1;
     @BindView(R.id.subCat2)
     EditText subCat2;
+    @BindView(R.id.button8)
+    Button addSubCat;
+    @BindView(R.id.linearLayout)
+    LinearLayout linearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +96,7 @@ public class CategoryUpload extends AppCompatActivity {
         ButterKnife.bind(this);
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
+        addEditText();
         choose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -102,7 +115,25 @@ public class CategoryUpload extends AppCompatActivity {
                 saveProduct();
             }
         });
+        addSubCat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+             addEditText();
+            }
+        });
 
+
+    }
+    public void addEditText() {
+        LinearLayout ll = (LinearLayout)findViewById(R.id.linearLayout);
+        // add edittext
+        et = new EditText(this);
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        et.setLayoutParams(p);
+        et.setHint("Sub Category "+numberOfLines);
+        et.setId(numberOfLines + 1);
+        ll.addView(et);
+        numberOfLines++;
     }
 
     private void selectImage()
@@ -220,6 +251,15 @@ public class CategoryUpload extends AppCompatActivity {
     }
 
     private void saveProduct(){
+        List<String> subList = new ArrayList<>();
+        for(int i=1; i<numberOfLines;i++){
+            EditText editText =(EditText) findViewById(i+1);
+            subList.add(editText.getText().toString());
+        }
+        String[] subCatArray = new String[subList.size()];
+        for (int i =0; i < subList.size(); i++){
+            subCatArray[i] = subList.get(i);
+        }
 
         String catName = etCatName.getText().toString();
         String subCategory1 = subCat1.getText().toString();
@@ -227,7 +267,7 @@ public class CategoryUpload extends AppCompatActivity {
         String [] subCategories = {subCategory1, subCategory2};
 
         Map<String, Object> docData = new HashMap<>();
-        docData.put("subCategories", Arrays.asList(subCategories));
+        docData.put("subCategories", Arrays.asList(subCatArray));
         docData.put("catImgUrl", categoryURL);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();

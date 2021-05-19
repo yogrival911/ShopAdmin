@@ -98,8 +98,6 @@ public class ProductUploadActivity extends AppCompatActivity implements uploadLi
     Button saveProduct;
     @BindView(R.id.etProName)
     EditText etProName;
-    @BindView(R.id.button8)
-    Button button;
     @BindView(R.id.proTIL)
     TextInputLayout proTIL;
     @BindView(R.id.subCategory)
@@ -219,17 +217,6 @@ public class ProductUploadActivity extends AppCompatActivity implements uploadLi
         rvThumbnail.setLayoutManager(gridLayoutManager);
         rvThumbnail.setAdapter(placeHolderAdapter);
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(!etProName.getText().toString().isEmpty()) {
-                    Toast.makeText(ProductUploadActivity.this, "you ",Toast.LENGTH_LONG).show();
-                } else {
-                    etProName.setError("Please Enter Email id");
-                    proTIL.setError("error");
-                }
-            }
-        });
         choose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
