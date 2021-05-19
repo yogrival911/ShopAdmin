@@ -64,8 +64,6 @@ public class UploadActivity extends AppCompatActivity {
     @BindView(R.id.imageView3)
     ImageView imageView;
 
-    private List<Products> productsList = new ArrayList<>();
-    private List<Banner> bannerList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,33 +92,33 @@ public class UploadActivity extends AppCompatActivity {
         if(currentUser!=null){
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             // Create a new user with a first and last name
-            db.collection("banners")
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                    Log.d("TAG", document.getId() + " => " + document.getData());
-                                    Banner banner = document.toObject(Banner.class);
-                                    bannerList.add(banner);
-                                }
-                                Glide.with(UploadActivity.this).load(bannerList.get(0).getImgUrl()).into(imageView);
-
-//                                storageReference = storage.getReferenceFromUrl(productsList.get(0).getImgUrl());
-//                                StorageReference sr = storageReference.child("images/"+bannerList.get(0).getImgUrl());
+//            db.collection("banners")
+//                    .get()
+//                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                            if (task.isSuccessful()) {
+//                                for (QueryDocumentSnapshot document : task.getResult()) {
+//                                    Log.d("TAG", document.getId() + " => " + document.getData());
+//                                    Banner banner = document.toObject(Banner.class);
+//                                    bannerList.add(banner);
+//                                }
+//                                Glide.with(UploadActivity.this).load(bannerList.get(0).getImgUrl()).into(imageView);
 //
-//                                sr.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-//                                    @Override
-//                                    public void onComplete(@NonNull Task<Uri> task) {
-//                                        Log.i("to", task.toString());
-//                                    }
-//                                });
-                            } else {
-                                Log.d("TAG", "Error getting documents: ", task.getException());
-                            }
-                        }
-                    });
+////                                storageReference = storage.getReferenceFromUrl(productsList.get(0).getImgUrl());
+////                                StorageReference sr = storageReference.child("images/"+bannerList.get(0).getImgUrl());
+////
+////                                sr.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+////                                    @Override
+////                                    public void onComplete(@NonNull Task<Uri> task) {
+////                                        Log.i("to", task.toString());
+////                                    }
+////                                });
+//                            } else {
+//                                Log.d("TAG", "Error getting documents: ", task.getException());
+//                            }
+//                        }
+//                    });
         }
         else {
             // Choose authentication providers

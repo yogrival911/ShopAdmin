@@ -9,7 +9,7 @@ public class Products implements Serializable {
     private String productName;
     private String category;
     private String subCategory;
-    private int id;
+    private String  id;
     private int markPrice;
     private int sellPrice;
     private Boolean isWishList;
@@ -21,7 +21,7 @@ public class Products implements Serializable {
         this.imgUrl = imgUrl;
     }
 
-    public Products(String productName, String category, String subCategory, int id, int markPrice, int sellPrice, Boolean isWishList, String unit, List<String> imgUrlList) {
+    public Products(String productName, String category, String subCategory, String id, int markPrice, int sellPrice, Boolean isWishList, String unit, List<String> imgUrlList) {
         this.productName = productName;
         this.category = category;
         this.subCategory = subCategory;
@@ -60,11 +60,11 @@ public class Products implements Serializable {
         this.subCategory = subCategory;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

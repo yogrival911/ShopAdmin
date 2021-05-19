@@ -15,6 +15,8 @@ public class MainActivity extends AppCompatActivity {
 Button bannerButton;
 @BindView(R.id.button5)
 Button productsButton;
+@BindView(R.id.catAdd)
+Button catAdd;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,7 +34,12 @@ Button productsButton;
                 startActivity(new Intent(MainActivity.this, ProductUploadActivity.class));
             }
         });
-
+        catAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, CategoryUpload.class));
+            }
+        });
 
     }
 }

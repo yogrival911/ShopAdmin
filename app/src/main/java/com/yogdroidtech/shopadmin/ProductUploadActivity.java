@@ -22,8 +22,12 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +38,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -73,15 +78,17 @@ public class ProductUploadActivity extends AppCompatActivity implements uploadLi
     private  int placePosition;
     List<Uri> filePathLists = new ArrayList<>();
     List<String> uploadFileUrlList = new ArrayList<>();
+    List<String> categoryList = new ArrayList<>();
 
     private List<Products> productsList = new ArrayList<>();
     private List<Banner> bannerList = new ArrayList<>();
     private List<Bitmap> bitmapList = new ArrayList<>();
+    List<String> subCategoryList = new ArrayList<>();
 
     @BindView(R.id.button6)
     Button choose;
 
-    @BindView(R.id.button7)
+    @BindView(R.id.button3)
     Button upload;
 
     @BindView(R.id.rvThumbnail)
@@ -89,6 +96,18 @@ public class ProductUploadActivity extends AppCompatActivity implements uploadLi
 
     @BindView(R.id.saveProduct)
     Button saveProduct;
+    @BindView(R.id.etProName)
+    EditText etProName;
+    @BindView(R.id.button8)
+    Button button;
+    @BindView(R.id.proTIL)
+    TextInputLayout proTIL;
+    @BindView(R.id.subCategory)
+    EditText subCategory;
+    @BindView(R.id.spinner45)
+    Spinner categoryDropDown;
+    @BindView(R.id.spinner49)
+    Spinner subCategoryDrop;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,8 +122,92 @@ public class ProductUploadActivity extends AppCompatActivity implements uploadLi
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
+
         Bitmap icon = getBitmaps(this,R.drawable.add);
 //        Bitmap icon = BitmapFactory.decodeResource(getApplicationContext().getResources(),R.drawable.add);
+
+        categoryList.add("Staples");
+        categoryList.add("Snacks");
+        categoryList.add("Packaged Food");
+        categoryList.add("Personal Care");
+        categoryList.add("Household");
+        categoryList.add("Dairy/Egg");
+
+        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categoryList);
+        categoryAdapter.setDropDownViewResource(android.R.layout.select_dialog_singlechoice);
+        categoryDropDown.setAdapter(categoryAdapter);
+
+
+        categoryDropDown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                List<String> subCatList = new ArrayList<>();
+                if(adapterView.getSelectedItem().toString().equals("Staples")){
+                    subCatList.add("Dals/Pulses");
+                    subCatList.add("Ghee/Oil");
+                    subCatList.add("Atta/Flours");
+                    subCatList.add("Masala/Spices");
+                    subCatList.add("Rice");
+                    subCatList.add("Dry Nuts");
+                    subCatList.add("Sugar/Jaggery");
+                }
+                if(adapterView.getSelectedItem().toString().equals("Snacks")){
+                    subCatList.add("Biscuit");
+                    subCatList.add("Chips/Namkeen");
+                }
+                if(adapterView.getSelectedItem().toString().equals("Snacks")){
+                    subCatList.add("Chips");
+                    subCatList.add("Namkeen");
+                }
+                if(adapterView.getSelectedItem().toString().equals("Packaged Food")){
+                    subCatList.add("Noodles/Pasta");
+                    subCatList.add("Chocolates/Sweets");
+                    subCatList.add("Sauces");
+                    subCatList.add("Pickles");
+                }
+                if(adapterView.getSelectedItem().toString().equals("Personal Care")){
+                    subCatList.add("Soap");
+                    subCatList.add("Hair Care");
+                    subCatList.add("Oral Care");
+                    subCatList.add("Deo/Talc");
+                    subCatList.add("Skin Care");
+                }
+                if(adapterView.getSelectedItem().toString().equals("Household Care")){
+                    subCatList.add("Detergent");
+                    subCatList.add("Utensils Cleaner");
+                    subCatList.add("Floor cleaner");
+                    subCatList.add("Repellant/Fresheners");
+
+                }
+                if(adapterView.getSelectedItem().toString().equals("Dairy/Egg")){
+                    subCatList.add("Dairy");
+                    subCatList.add("Eggs");
+
+                }
+                ArrayAdapter<String> subCatAdapter = new ArrayAdapter<String>(ProductUploadActivity.this, android.R.layout.simple_spinner_item, subCatList);
+                subCatAdapter.setDropDownViewResource(android.R.layout.select_dialog_singlechoice);
+                subCategoryDrop.setAdapter(subCatAdapter);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+//        subCategoryList.add("Dal/Pulses");
+//        subCategoryList.add("Ghee/Oil");
+//        subCategoryList.add("Atta");
+//        subCategoryList.add("Spices");
+//        subCategoryList.add("Biscuit");
+//        subCategoryList.add("Namkeen");
+//        subCategoryList.add("Noodles");
+//        subCategoryList.add("Pasta");
+//        subCategoryList.add("Detergent");
+//        subCategoryList.add("Utensils");
+//
+//        ArrayAdapter<String> subCatAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, subCategoryList);
+//        subCatAdapter.setDropDownViewResource(android.R.layout.select_dialog_singlechoice);
+//        subCategoryDrop.setAdapter(subCatAdapter);
 //
         bitmapList.add(icon);
         bitmapList.add(icon);
@@ -116,6 +219,17 @@ public class ProductUploadActivity extends AppCompatActivity implements uploadLi
         rvThumbnail.setLayoutManager(gridLayoutManager);
         rvThumbnail.setAdapter(placeHolderAdapter);
 
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!etProName.getText().toString().isEmpty()) {
+                    Toast.makeText(ProductUploadActivity.this, "you ",Toast.LENGTH_LONG).show();
+                } else {
+                    etProName.setError("Please Enter Email id");
+                    proTIL.setError("error");
+                }
+            }
+        });
         choose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -219,7 +333,8 @@ public class ProductUploadActivity extends AppCompatActivity implements uploadLi
                                uploadFileUrlList.add(task.getResult().toString());
                                Log.i("yog", uploadFileUrlList.toString());
                                Toast.makeText(ProductUploadActivity.this, "Image URL Downloaded!!", Toast.LENGTH_SHORT).show();
-
+                               upload.setEnabled(false);
+                               saveProduct.setEnabled(true);
                            }
                        });
                    }
@@ -266,6 +381,8 @@ public class ProductUploadActivity extends AppCompatActivity implements uploadLi
                 bitmapList.set(placePosition, bitmap);
                 placeHolderAdapter.setBitmapList(bitmapList);
                 placeHolderAdapter.notifyDataSetChanged();
+                upload.setEnabled(true);
+                saveProduct.setEnabled(false);
 //                imageView.setImageBitmap(bitmap);
             }
             catch (IOException e) {
@@ -289,24 +406,28 @@ public class ProductUploadActivity extends AppCompatActivity implements uploadLi
         for (int i =0; i < uploadFileUrlList.size(); i++){
             arr[i] = uploadFileUrlList.get(i);
         }
+        String id = UUID.randomUUID().toString();
+        String prodName = etProName.getText().toString();
+        String category = categoryDropDown.getSelectedItem().toString();
+        String subCategory = subCategoryDrop.getSelectedItem().toString();
 
         Map<String, Object> docData = new HashMap<>();
         docData.put("imgUrl",Arrays.asList(arr));
-        docData.put("id", 123);
-        docData.put("productName", "Car");
-        docData.put("category", "Car");
-        docData.put("subCategory", "Car");
+        docData.put("id", id);
+        docData.put("productName", prodName);
+        docData.put("category", category);
+        docData.put("subCategory", subCategory);
         docData.put("markPrice", 44);
         docData.put("sellPrice", 33);
         docData.put("isWishList", false);
         docData.put("unit", "KG");
 
-        Products product = new Products("","","",88,9,9,true,"kg",uploadFileUrlList);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("products").document().set(docData).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Toast.makeText(ProductUploadActivity.this, "Image Saved in Database!!", Toast.LENGTH_SHORT).show();
+                saveProduct.setEnabled(false);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

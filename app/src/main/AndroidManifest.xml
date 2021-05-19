@@ -11,7 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ShopAdmin">
-        <activity android:name=".ProductUploadActivity"></activity>
+        <activity android:name=".CategoryUpload"></activity>
+        <activity android:name=".ProductUploadActivity" />
         <activity android:name=".UploadActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
